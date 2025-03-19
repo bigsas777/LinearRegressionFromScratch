@@ -18,21 +18,25 @@ noise_test = np.random.randn(100, 1) * 2
 output_test = 3 * input_test + 7 + noise_test
 
 # Creazione e addestramento modello
-model = LinearRegression(0.01, 2000)
+model = LinearRegression(0.01, 1000)
+start = time.perf_counter()
 model.train(input, output)
+end = time.perf_counter()
 theta0, theta1 = model.theta0, model.theta1
 
-# Stampa dei parametri theta trovati
-print(f"Theta0: {theta0}, Theta1: {theta1}")
 
 # Metriche del modello
+train_time = end - start
 test_pred = model.predict(input_test)
 r2 = r2_score(output_test, test_pred)
-print(f"R2 Score: {r2}")
 mae = mean_absolute_error(output_test, test_pred)
-print('Mean Absolute Error (MAE):', mae)
 mse = mean_squared_error(output_test, test_pred)
-print('Root Mean Squared Error:', sqrt(mse))
+# Stampa metriche
+print(f"Training time: {train_time}s")
+print(f"Theta0: {theta0}, Theta1: {theta1}")
+print(f"R2 Score: {r2}")
+print(f"Mean Absolute Error (MAE): {mae}")
+print(f'Root Mean Squared Error: {sqrt(mse)}')
 
 # Scatter plot con retta regressione
 plt.figure(figsize=(8,6))
@@ -46,7 +50,7 @@ plt.plot(X_line, Y_line, 'r-', linewidth=2, label="Modello 1")
 
 plt.xlabel("X", fontsize=12)
 plt.ylabel("Y", fontsize=12)
-plt.title("Test Linear Regression from Scratch", fontsize=14)
+plt.title("Linear Regression from Scratch", fontsize=14)
 plt.legend()
 plt.grid(True)
 plt.show()
