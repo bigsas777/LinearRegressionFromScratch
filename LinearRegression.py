@@ -1,63 +1,117 @@
-from numpy import random
+import numpy as np
 
 class LinearRegression():
-    # params: learning_rate(alpha): float, n_iters: int
-    # return: void
-    def __init__(self, learning_rate, n_iters):
-        self.learning_rate = learning_rate
+    """
+    Class implementing linear regression using the gradient descent method.
+    """
+
+    def __init__(self, input, output, n_iters=1000, learning_rate=0.01):
+        """
+        Initializes the linear regression model.
+
+        Args:
+            input (numpy.ndarray): Input matrix (features) of dimensions (m, n).
+            output (numpy.ndarray): Output vector (target) of dimensions (m, 1).
+            n_iters (int): Number of iterations for gradient descent.
+            learning_rate (float): Learning rate (alpha) for gradient descent.
+
+        Returns:
+            None
+        """
+        self.input = self.add_ones(input) # Adds a column of ones to handle theta0
+        self.output = output
+        self.m = self.input.shape[0]
+        self.thetas = np.random.rand(self.input.shape[1], 1)
         self.n_iters = n_iters
-        self.theta0 = random.rand()
-        self.theta1 = random.rand()
-        self.m = 0
-        self.input = None
-        self.output = None
-        self.thetas0 = []
-        self.thetas1 = []
+        self.learning_rate = learning_rate
         self.costs = []
 
-    # params: input, output: numpy_array
-    # return: void
-    def train(self, input, output):
-        self.m = input.size
-        self.input = input
-        self.output = output
-        for i in range(self.n_iters):
+    def train(self):
+        """
+        Trains the model using gradient descent.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+        for _ in range(self.n_iters):
             self.costs.append(self.cost_function())
-            self.thetas0.append(self.theta0)
-            self.thetas1.append(self.theta1)
             self.gradient_descent()
 
-    # params: input_val: qualsiasi input numerico o array di num
-    # return: float
-    def predict(self, input_val):
-        out_pred = self.theta0 + self.theta1 * input_val
-        return out_pred
+    def predict(self, input_pred):
+        """
+        Makes predictions using the calculated theta parameters.
 
-    # Funzione di costo
-    def cost_function(self):
-        sum = 0.
-        for i in range(self.m):
-           sum += (self.predict(self.input[i]) - self.output[i]) ** 2
-        
-        return (1/2*self.m) * sum
+        Args:
+            input_pred (numpy.ndarray): Input matrix for prediction of dimensions (m, n).
 
-    # Applicazione del gradient descent per la minimizzazione dei parametri theta
-    def gradient_descent(self):
-        self.theta0 = self.theta0 - self.learning_rate * self.cf_der_theta0()
-        self.theta1 = self.theta1 - self.learning_rate * self.cf_der_theta1()
-
-    # Derivata parziale della funzione di costo rispetto a theta0
-    def cf_der_theta0(self):
-        sum = 0.
-        for i in range(self.m):
-           sum += self.predict(self.input[i]) - self.output[i]
-        
-        return (1/self.m) * sum
+        Returns:
+            numpy.ndarray: Predicted output vector of dimensions (m, 1).
+        """
+        return self.predict_with_ones(self.add_ones(input_pred))
     
-    # Derivata parziale della funzione di costo rispetto a theta1
-    def cf_der_theta1(self):
-        sum = 0.
-        for i in range(self.m):
-           sum += (self.predict(self.input[i]) - self.output[i]) * self.input[i]
-        
-        return (1/self.m) * sum
+    def predict_with_ones(self, input_pred):
+        """
+        Makes predictions using an input matrix that already includes a column of ones.
+
+        Args:
+            input_pred (numpy.ndarray): Input matrix with a column of ones included.
+
+        Returns:
+            numpy.ndarray: Predicted output vector with dimensions (m, 1).
+        """
+        return np.dot(input_pred, self.thetas)
+
+    def cost_function(self):
+        """
+        Computes the cost function (mean squared error).
+
+        Args:
+            None
+
+        Returns:
+            float: Value of the cost function.
+        """
+        error_vector = self.error()
+        return (1/(2*self.m)) * np.dot(np.transpose(error_vector), error_vector)
+
+    def gradient_descent(self):
+        """
+        Updates the theta parameters using gradient descent.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+        self.thetas -= self.learning_rate * (1/self.m) * np.dot(np.transpose(self.input), self.error())
+    
+    def add_ones(self, input_matrix):
+        """
+        Adds a column of ones to the input matrix to account for the theta0 parameter.
+
+        Args:
+            input_matrix (numpy.ndarray): Input matrix with dimensions (m, n).
+
+        Returns:
+            numpy.ndarray: Input matrix with an added column of ones, dimensions (m, n+1).
+        """
+        m = input_matrix.shape[0]
+        ones = np.ones((m, 1)) # Column of ones to handle theta0
+        input_matrix = np.hstack((ones, input_matrix))
+        return input_matrix
+    
+    def error(self):
+        """
+        Computes the error vector between predictions and actual values.
+
+        Args:
+            None
+
+        Returns:
+            numpy.ndarray: Error vector with dimensions (m, 1).
+        """
+        return self.predict_with_ones(self.input) - self.output
