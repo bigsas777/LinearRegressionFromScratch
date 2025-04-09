@@ -9,7 +9,10 @@ This repository contains implementations of various machine learning algorithms 
 
 ## 📌 Implemented Algorithms
 - **🔢 Linear Regression**: Uses matrix operations for efficient computation and supports multiple features (multivariate regression). Optimized with gradient descent for parameter tuning.
-- **🧠 Logistic Regression** *(Coming soon!)*: Implements binary classification using the sigmoid function and gradient-based optimization.
+- **🧠 Logistic Regression**: Implements binary classification using the sigmoid function and gradient-based optimization. The model predicts probabilities and classifies inputs into binary categories (0 or 1) based on a threshold (default: 0.5). Includes a cost function based on log loss and supports gradient descent for parameter updates.
+
+## 🛠️ Input Handling
+All models in this repository accept inputs as NumPy arrays. If the input arrays do not match the required shape, the models will internally reshape or modify them as needed to ensure compatibility with the algorithm's computations.
 
 This project is a continuous learning journey—stay tuned for more algorithms! 🚀
 
