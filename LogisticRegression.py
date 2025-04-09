@@ -1,14 +1,14 @@
 import numpy as np
 from utils import add_ones, ensure_2d
 
-class LinearRegression():
+class LogisticRegression:
     """
-    Class implementing linear regression using the gradient descent method.
+    Class implementing logistic regression using the gradient descent method.
     """
 
     def __init__(self, input, output, n_iters=1000, learning_rate=0.01):
         """
-        Initializes the linear regression model.
+        Initializes the logistic regression model.
 
         Args:
             input (numpy.ndarray): Input matrix (features) of dimensions (m, n).
@@ -20,7 +20,7 @@ class LinearRegression():
             None
         """
         self.input = add_ones(ensure_2d(input))  # Ensures input is 2D
-        self.output = ensure_2d(output)
+        self.output = ensure_2d(output)  # Ensures output is 2D
         self.m = self.input.shape[0]
         self.thetas = np.random.rand(self.input.shape[1], 1)
         self.n_iters = n_iters
@@ -49,10 +49,10 @@ class LinearRegression():
             input_pred (numpy.ndarray): Input matrix for prediction of dimensions (m, n).
 
         Returns:
-            numpy.ndarray: Predicted output vector of dimensions (m, 1).
+            numpy.ndarray: Predicted output vector of dimensions (m, 1), with values 0 or 1.
         """
-        return self.predict_with_ones(add_ones(ensure_2d(input_pred)))
-    
+        return np.where(self.predict_with_ones(add_ones(ensure_2d(input_pred))) >= 0.5, 1, 0)
+
     def predict_with_ones(self, input_pred):
         """
         Makes predictions using an input matrix that already includes a column of ones.
@@ -63,11 +63,23 @@ class LinearRegression():
         Returns:
             numpy.ndarray: Predicted output vector with dimensions (m, 1).
         """
-        return np.dot(input_pred, self.thetas)
+        return self.sigmoid(np.dot(input_pred, self.thetas))
+
+    def sigmoid(self, z):
+        """
+        Computes the sigmoid function.
+
+        Args:
+            z (numpy.ndarray): Input array.
+
+        Returns:
+            numpy.ndarray: Sigmoid of the input array.
+        """
+        return 1 / (1 + np.exp(-z))
 
     def cost_function(self):
         """
-        Computes the cost function (mean squared error).
+        Computes the cost function (log loss).
 
         Args:
             None
@@ -75,9 +87,11 @@ class LinearRegression():
         Returns:
             float: Value of the cost function.
         """
-        error_vector = self.error()
-        return (1 / (2 * self.m)) * np.dot(error_vector.T, error_vector)
-
+        epsilon = 1e-9  # Small constant to avoid log(0)
+        p1 = np.dot(-self.output.T, np.log(self.predict_with_ones(self.input) + epsilon))
+        p2 = np.dot((1 - self.output).T, np.log(1 - self.predict_with_ones(self.input) + epsilon))
+        return 1 / self.m * (p1 + p2)
+    
     def gradient_descent(self):
         """
         Updates the theta parameters using gradient descent.
@@ -88,16 +102,4 @@ class LinearRegression():
         Returns:
             None
         """
-        self.thetas -= self.learning_rate * (1/self.m) * np.dot(self.input.T, self.error())
-    
-    def error(self):
-        """
-        Computes the error vector between predictions and actual values.
-
-        Args:
-            None
-
-        Returns:
-            numpy.ndarray: Error vector with dimensions (m, 1).
-        """
-        return self.predict_with_ones(self.input) - self.output
+        self.thetas -= self.learning_rate * (1 / self.m) * np.dot(self.input.T, self.predict_with_ones(self.input) - self.output)
