@@ -2,8 +2,8 @@ import numpy as np
 
 class StandardScaler():
     def __init__(self):
-        self.means = 0.
-        self.std_devs = 0.
+        self.means = None
+        self.std_devs = None
 
     def fit(self, input_data):
         self.means = np.mean(input_data, axis=0)
