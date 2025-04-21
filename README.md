@@ -1,5 +1,10 @@
 # 🚀 Machine Learning Algorithms from Scratch
 
+![Python](https://img.shields.io/badge/language-Python-blue.svg)
+![NumPy](https://img.shields.io/badge/dependencies-NumPy-yellow.svg)
+![Status](https://img.shields.io/badge/status-in%20progress-lightgrey.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+
 This repository contains implementations of various machine learning algorithms built entirely from scratch using Python and NumPy. The goal is to gain a deep understanding of these models by coding them from the ground up, without relying on high-level machine learning libraries.
 
 ## ✨ Features
